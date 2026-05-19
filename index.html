@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liquidación del Viaje 🏡</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EFE9;
+    --border: rgba(0,0,0,0.09);
+    --border-med: rgba(0,0,0,0.14);
+    --text: #1A1917;
+    --text2: #6B6860;
+    --text3: #9E9C97;
+    --green-bg: #E1F5EE;
+    --green: #0F6E56;
+    --red-bg: #FAECE7;
+    --red: #993C1D;
+    --blue-bg: #E6F1FB;
+    --blue: #185FA5;
+    --amber-bg: #FAEEDA;
+    --amber: #854F0B;
+    --teal-bg: #E1F5EE;
+    --teal: #085041;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 2rem;
+    animation: fadeUp 0.4s ease both;
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+  .header .sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 5px;
+  }
+  .total-chip {
+    background: var(--text);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 4px;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.4s 0.05s ease both;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 8px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    border: none;
+    background: none;
+    color: var(--text2);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* Panels */
+  .panel { display: none; animation: fadeUp 0.25s ease both; }
+  .panel.active { display: block; }
+
+  /* Metric grid */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .metric {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    transition: transform 0.15s;
+  }
+  .metric:hover { transform: translateY(-1px); }
+  .metric .lbl {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .metric .val {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-family: 'DM Mono', monospace;
+  }
+  .metric .sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 3px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0 16px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--border);
+    gap: 12px;
+  }
+  .row:last-child { border-bottom: none; }
+
+  .name { font-weight: 500; font-size: 14px; }
+  .name-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .right-cell { text-align: right; flex-shrink: 0; }
+  .amt { font-family: 'DM Mono', monospace; font-weight: 500; font-size: 14px; }
+  .amt-pos { color: var(--green); }
+  .amt-neg { color: var(--red); }
+  .amt-neu { color: var(--text2); }
+
+  /* Badges */
+  .badge-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+  .badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  .b-d1 { background: var(--blue-bg); color: var(--blue); }
+  .b-d2 { background: var(--green-bg); color: var(--teal); }
+  .b-guaro { background: var(--amber-bg); color: var(--amber); }
+  .b-pago { background: var(--surface2); color: var(--text2); }
+
+  /* Section title */
+  .sec-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 1.4rem 0 0.6rem;
+  }
+
+  /* Note */
+  .note {
+    font-size: 12.5px;
+    color: var(--text2);
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    border-left: 3px solid var(--border-med);
+  }
+  .note.warn { border-left-color: #E24B4A; background: #FEF2F2; color: #7F1D1D; }
+  .note strong { font-weight: 600; }
+
+  /* Total bar */
+  .total-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    padding: 11px 16px;
+    background: var(--surface2);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    margin-top: -1px;
+    font-weight: 500;
+  }
+  .total-bar .tval { font-family: 'DM Mono', monospace; font-weight: 600; }
+
+  /* Transfer rows */
+  .tr-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .tr-card .group-header {
+    background: var(--surface2);
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .tr-row {
+    display: flex;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 0.5px solid var(--border);
+    gap: 10px;
+    transition: background 0.1s;
+  }
+  .tr-row:last-child { border-bottom: none; }
+  .tr-row:hover { background: #FAFAF8; }
+  .tr-from {
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 105px;
+  }
+  .tr-arrow {
+    color: var(--text3);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .tr-to {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--green);
+    min-width: 105px;
+  }
+  .tr-amt {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 14px;
+    background: var(--green-bg);
+    color: var(--green);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* Summary footer */
+  .summary-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--text);
+    color: #fff;
+    border-radius: var(--radius-lg);
+    margin-top: 1rem;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .summary-footer .sfval {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: #6EE7B7;
+  }
+
+  /* Gasto table */
+  .gasto-row .g-concept { font-size: 13px; color: var(--text); }
+  .gasto-row .g-pago { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    body { padding: 1.25rem .75rem; }
+    .header h1 { font-size: 22px; }
+    .tr-from, .tr-to { min-width: 80px; font-size: 13px; }
+    .metric .val { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>Liquidación del Viaje 🏡</h1>
+        <p class="sub">15 personas · 2 días · 14 transferencias para cuadrar</p>
+      </div>
+      <span class="total-chip">$2.121.400 COP</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('resumen', this)">Resumen</button>
+    <button class="tab" onclick="showTab('saldos', this)">Saldos</button>
+    <button class="tab" onclick="showTab('pagos', this)">Instrucciones de pago</button>
+  </div>
+
+  <!-- RESUMEN -->
+  <div id="resumen" class="panel active">
+    <div class="note">
+      Los gastos generales suman <strong>$1.869.400</strong> menos <strong>$144.000</strong> de descuento por estadía de Juan Pablo = <strong>$1.725.400</strong> netos, divididos en 2 mitades iguales entre los días. El guaro suma <strong>$396.000</strong> dividido entre 8 personas.
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="lbl">Cuota general día 1</div>
+        <div class="val">$61.621</div>
+        <div class="sub">÷ 14 asistentes</div>
+      </div>
+      <div class="metric">
+        <div class="lbl">Cuota general día 2</div>
+        <div class="val">$66.362</div>
+        <div class="sub">÷ 13 asistentes</div>
+      </div>
+      <div class="metric">
+        <div class="lbl">Cuota guaro</div>
+        <div class="val">$49.500</div>
+        <div class="sub">÷ 8 tomadores</div>
+      </div>
+      <div class="metric">
+        <div class="lbl">Total gasto viaje</div>
+        <div class="val">$2.121.400</div>
+        <div class="sub">generales + guaro</div>
+      </div>
+    </div>
+
+    <div class="sec-title">Gastos generales</div>
+    <div class="card">
+      <div class="row gasto-row">
+        <div><div class="g-concept">Carne</div><div class="g-pago">Pagó Ruiz</div></div>
+        <span class="amt amt-neu">$395.000</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Verduras</div><div class="g-pago">Pagó Ruiz</div></div>
+        <span class="amt amt-neu">$268.000</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Mercado</div><div class="g-pago">Pagó Erika</div></div>
+        <span class="amt amt-neu">$549.500</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Mercado</div><div class="g-pago">Pagó Erika</div></div>
+        <span class="amt amt-neu">$363.500</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Carne hamburguesa</div><div class="g-pago">Pagó Erika</div></div>
+        <span class="amt amt-neu">$140.000</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Agua finca</div><div class="g-pago">Pagó Jose</div></div>
+        <span class="amt amt-neu">$15.000</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Domicilio 2</div><div class="g-pago">Pagó Juan Esteban</div></div>
+        <span class="amt amt-neu">$67.400</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Cervezas</div><div class="g-pago">Pagó Samuel</div></div>
+        <span class="amt amt-neu">$71.000</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Estadía Juan Pablo día 2 <span class="badge b-d2">descuento</span></div><div class="g-pago">Aún no pagado</div></div>
+        <span class="amt" style="color:#E24B4A;">−$144.000</span>
+      </div>
+    </div>
+    <div class="total-bar"><span>Total generales neto</span><span class="tval">$1.725.400</span></div>
+
+    <div class="sec-title" style="margin-top:1.4rem">Gastos de guaro</div>
+    <div class="card">
+      <div class="row gasto-row">
+        <div><div class="g-concept">Guaro finca <span class="badge b-guaro">guaro</span></div><div class="g-pago">Pagó Jose</div></div>
+        <span class="amt amt-neu">$264.000</span>
+      </div>
+      <div class="row gasto-row">
+        <div><div class="g-concept">Guaro D1 <span class="badge b-guaro">guaro</span></div><div class="g-pago">Pagó Juan Esteban</div></div>
+        <span class="amt amt-neu">$132.000</span>
+      </div>
+    </div>
+    <div class="total-bar"><span>Total guaro</span><span class="tval">$396.000</span></div>
+
+    <div class="note warn" style="margin-top:1.25rem">
+      ⚠️ Juan Pablo debe <strong>$144.000 adicionales</strong> al grupo por quedarse un día extra, que aún <strong>no ha pagado</strong>. Esto está incluido en su saldo deudor total de $271.983.
+    </div>
+  </div>
+
+  <!-- SALDOS -->
+  <div id="saldos" class="panel">
+    <div class="sec-title">Acreedores — se les debe transferir</div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="name">Erika</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span></div>
+          <div class="name-sub">Aportó $1.053.000 · consume $127.983</div>
+        </div>
+        <div class="right-cell">
+          <div class="amt amt-pos" style="font-size:18px">+$925.017</div>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Ruiz</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">Aportó $663.000 · consume $177.483</div>
+        </div>
+        <div class="right-cell">
+          <div class="amt amt-pos" style="font-size:18px">+$485.517</div>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Jose</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">Aportó $279.000 · consume $177.483</div>
+        </div>
+        <div class="right-cell">
+          <div class="amt amt-pos" style="font-size:18px">+$101.517</div>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Juan Esteban</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span></div>
+          <div class="name-sub">Aportó $199.400 · consume $127.983</div>
+        </div>
+        <div class="right-cell">
+          <div class="amt amt-pos" style="font-size:18px">+$71.417</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">Deudores — deben transferir</div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="name">Juan Pablo</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span></div>
+          <div class="name-sub">Cuota $127.983 + estadía $144.000</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg" style="font-size:16px">−$271.983</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Juan</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">$128k días + $49.5k guaro</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$177.483</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Daniela</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">$128k días + $49.5k guaro</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$177.483</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Mathieu</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">$128k días + $49.5k guaro</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$177.483</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Isabel</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">$128k días + $49.5k guaro</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$177.483</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Mateo</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span></div>
+          <div class="name-sub">Solo días</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$127.983</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Susana</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span></div>
+          <div class="name-sub">Solo días</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$127.983</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Pedro</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">$61.6k día 1 + $49.5k guaro</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$111.121</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Samuel</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span><span class="badge b-d2">Día 2</span><span class="badge b-guaro">guaro</span></div>
+          <div class="name-sub">Aportó $71k · debe $177.5k</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$106.483</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Indira</div>
+          <div class="badge-row"><span class="badge b-d2">Día 2</span></div>
+          <div class="name-sub">Solo día 2</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$66.362</div></div>
+      </div>
+      <div class="row">
+        <div>
+          <div class="name">Manuela</div>
+          <div class="badge-row"><span class="badge b-d1">Día 1</span></div>
+          <div class="name-sub">Solo día 1</div>
+        </div>
+        <div class="right-cell"><div class="amt amt-neg">−$61.621</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGOS -->
+  <div id="pagos" class="panel">
+    <div class="note">
+      Transferencias directas, sin intermediarios. 14 transferencias en total para liquidar todas las deudas a cero.
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 1 · Indira → Ruiz</div>
+      <div class="tr-row">
+        <span class="tr-from">Indira</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Ruiz</span>
+        <span class="tr-amt">$66.362</span>
+      </div>
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 2 · Mathieu y Daniela → Ruiz</div>
+      <div class="tr-row">
+        <span class="tr-from">Mathieu</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Ruiz</span>
+        <span class="tr-amt">$177.483</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Daniela</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Ruiz</span>
+        <span class="tr-amt">$177.483</span>
+      </div>
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 3 · Pedro y Manuela → Erika</div>
+      <div class="tr-row">
+        <span class="tr-from">Pedro</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$111.121</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Manuela</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$61.621</span>
+      </div>
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 4 · Samuel e Isabel → Erika</div>
+      <div class="tr-row">
+        <span class="tr-from">Samuel</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$106.483</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Isabel</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$177.483</span>
+      </div>
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 5 · Juan y Susana → Erika</div>
+      <div class="tr-row">
+        <span class="tr-from">Juan</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$177.483</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Susana</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$127.983</span>
+      </div>
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 6 · Mateo → Erika</div>
+      <div class="tr-row">
+        <span class="tr-from">Mateo</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$127.983</span>
+      </div>
+    </div>
+
+    <div class="tr-card">
+      <div class="group-header">Grupo 7 · Juan Pablo — deuda dividida entre 4 acreedores</div>
+      <div class="tr-row">
+        <span class="tr-from">Juan Pablo</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Jose</span>
+        <span class="tr-amt">$101.517</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Juan Pablo</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Juan Esteban</span>
+        <span class="tr-amt">$71.417</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Juan Pablo</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Ruiz</span>
+        <span class="tr-amt">$64.190</span>
+      </div>
+      <div class="tr-row">
+        <span class="tr-from">Juan Pablo</span>
+        <span class="tr-arrow">→</span>
+        <span class="tr-to">Erika</span>
+        <span class="tr-amt">$34.859</span>
+      </div>
+    </div>
+
+    <div class="summary-footer">
+      <span>Total liquidado · saldo final</span>
+      <span class="sfval">$1.583.468 ✓</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
